@@ -1,5 +1,12 @@
+
 import pandas as pd
 import numpy as np
+import scipy as sp
+from sklearn.feature_extraction import text
+from nltk.corpus import stopwords
+import nltk.stem
+
+stemmer = nltk.stem.SnowballStemmer('english')
 
 africa = ['Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cameroon', 'Cape Verde',
           'Central African Republic', 'Chad', 'Comoros', 'Democratic Republic of the Congo', 'Djibouti', 'Egypt',
@@ -1485,6 +1492,10 @@ rose = ['Agdam Gyzyl Uzumu', 'Agdam gyzyl izyum', 'Agdam gyzyl uzumu', 'Agdam qi
         'Barbera Rose', 'Chablais Blanc', 'Chablais Rose', 'Chablis Blanc', 'Chablis Rose', 'Chardonnay Rose',
         'Pink Chablis', 'Rielsing Rose']
 
+class StemmedCountVectorizer(text.CountVectorizer):
+    def build_analyzer(self):
+        analyzer = super(StemmedCountVectorizer, self).build_analyzer()
+        return lambda doc: ([stemmer.stem(w) for w in analyzer(doc)])
 
 def FE(wine, country_cutoff=1000):
     wine.set_index('id', inplace=True)
@@ -1509,4 +1520,9 @@ def FE(wine, country_cutoff=1000):
                                                          np.where(wine['points'] <= 93, 'Excellent',
                                                                  np.where(wine['points'] <= 97, 'Superb','Classic',))))))
     print('dim after feature engineering:', wine.shape)
-    return wine
+
+    vectorizer = StemmedCountVectorizer(analyzer="word", stop_words='english')
+    processed_reviews = vectorizer.fit_transform(wine['description'])
+
+    return wine, processed_reviews
+
