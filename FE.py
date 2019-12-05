@@ -1524,5 +1524,9 @@ def FE(wine, country_cutoff=1000):
     vectorizer = StemmedCountVectorizer(analyzer="word", stop_words='english')
     processed_reviews = vectorizer.fit_transform(wine['description'])
 
-    return wine, processed_reviews
+    new_cols = list(wine.columns) + list(vectorizer.vocabulary_.keys())
+    wine_merged = pd.concat([wine, pd.DataFrame.sparse.from_spmatrix(processed_reviews)], axis=1)
+    wine_merged.columns = new_cols
+
+    return wine_merged
 
