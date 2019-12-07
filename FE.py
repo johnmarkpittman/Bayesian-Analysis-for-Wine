@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import scipy as sp
@@ -19,11 +18,11 @@ class StemmedCountVectorizer(text.CountVectorizer):
         return lambda doc: ([stemmer.stem(w) for w in analyzer(doc)])
 
 
-def text_process(wine, one_hot=False):
+def text_process(wine, merged=True, one_hot=False):
     # Creating TF-Matrix
     wine = wine.copy(deep=True).reset_index()
     wine['description'] = wine['description'].str.replace('\d+', '')
-    vectorizer = StemmedCountVectorizer(analyzer="word", stop_words=my_stop_words)
+    vectorizer = StemmedCountVectorizer(analyzer="word", stop_words='english')
     processed_reviews = pd.DataFrame.sparse.from_spmatrix(vectorizer.fit_transform(wine['description']))
     new_cols = list(wine.columns) + list(vectorizer.vocabulary_.keys())
 
@@ -39,6 +38,10 @@ def text_process(wine, one_hot=False):
             wine_merged.columns = new_cols + [k.replace('-', '_').replace(' ', '_').lower() for k in encoder.get_feature_names()]
         else:
             wine_merged = 'mismatched indices, could not properly concatenate'
+
+    elif merged is False:
+        processed_reviews.columns=list(vectorizer.vocabulary_.keys())
+        wine_merged = processed_reviews
 
     else:
         if wine.shape[0] == processed_reviews.shape[0]:
