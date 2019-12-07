@@ -10,15 +10,48 @@ import json
 
 stemmer = nltk.stem.SnowballStemmer('english')
 
-# hacking sklearn's CountVectorizer class to include stemming support
 
 class StemmedCountVectorizer(text.CountVectorizer):
+    # hacking sklearn's CountVectorizer class to include stemming support
 
     def build_analyzer(self):
         analyzer = super(StemmedCountVectorizer, self).build_analyzer()
         return lambda doc: ([stemmer.stem(w) for w in analyzer(doc)])
 
-def FE(wine, country_cutoff=1000, one_hot=False):
+
+def text_process(wine, one_hot=False):
+    # Creating TF-Matrix
+    wine = wine.copy(deep=True).reset_index()
+    wine['description'] = wine['description'].str.replace('\d+', '')
+    vectorizer = StemmedCountVectorizer(analyzer="word", stop_words=my_stop_words)
+    processed_reviews = pd.DataFrame.sparse.from_spmatrix(vectorizer.fit_transform(wine['description']))
+    new_cols = list(wine.columns) + list(vectorizer.vocabulary_.keys())
+
+    # Converting Variety to One_hot_encoding
+    if one_hot is True:
+        encoder = OneHotEncoder()
+        encoded = pd.DataFrame.sparse.from_spmatrix(encoder.fit_transform(wine[['color']]))
+        wine.drop(columns=['color'], inplace=True)
+        new_cols = list(wine.columns) + list(vectorizer.vocabulary_.keys())
+
+        if (wine.shape[0] == processed_reviews.shape[0]) and (wine.shape[0] == encoded.shape[0]):
+            wine_merged = pd.concat([wine, processed_reviews, encoded], axis=1, ignore_index=True)
+            wine_merged.columns = new_cols + [k.replace('-', '_').replace(' ', '_').lower() for k in encoder.get_feature_names()]
+        else:
+            wine_merged = 'mismatched indices, could not properly concatenate'
+
+    else:
+        if wine.shape[0] == processed_reviews.shape[0]:
+            wine_merged = pd.concat([wine, processed_reviews], axis=1, ignore_index=True)
+            wine_merged.columns = new_cols
+
+        else:
+            wine_merged = 'mismatched indices, could not properly concatenate'
+
+    return wine_merged
+
+
+def FE(wine, country_cutoff=1000):
 
     # Opening wine and country dictionaries
     with open('country_dict.json', 'r') as fp:
@@ -56,34 +89,5 @@ def FE(wine, country_cutoff=1000, one_hot=False):
                                                          np.where(wine['points'] <= 93, 'Excellent',
                                                                  np.where(wine['points'] <= 97, 'Superb','Classic',))))))
 
-    # Creating TF-Matrix
-    my_stop_words = text.ENGLISH_STOP_WORDS.union(['country', 'color'])
-    wine = wine.copy(deep=True).reset_index()
-    wine['description'] = wine['description'].str.replace('\d+', '')
-    vectorizer = StemmedCountVectorizer(analyzer="word", stop_words=my_stop_words)
-    processed_reviews = pd.DataFrame.sparse.from_spmatrix(vectorizer.fit_transform(wine['description']))
-    new_cols = list(wine.columns) + list(vectorizer.vocabulary_.keys())
-    
-    # Converting Variety to One_hot_encoding
-    if one_hot is True:
-        encoder = OneHotEncoder()
-        encoded = pd.DataFrame.sparse.from_spmatrix(encoder.fit_transform(wine[['color']]))
-        wine.drop(columns=['color'], inplace=True)
-        new_cols = list(wine.columns) + list(vectorizer.vocabulary_.keys())
-
-        if (wine.shape[0] == processed_reviews.shape[0]) and (wine.shape[0] == encoded.shape[0]):
-            wine_merged = pd.concat([wine, processed_reviews, encoded], axis=1, ignore_index=True)
-            wine_merged.columns = new_cols + [k.replace('-', '_').replace(' ', '_').lower() for k in encoder.get_feature_names()]
-        else:
-            wine_merged = 'mismatched indices, could not properly concatenate'
-
-    else:
-        if wine.shape[0] == processed_reviews.shape[0]:
-            wine_merged = pd.concat([wine, processed_reviews], axis=1, ignore_index=True)
-            wine_merged.columns = new_cols
-    
-        else:
-            wine_merged = 'mismatched indices, could not properly concatenate'
-
-    return wine_merged
+    return wine
 
