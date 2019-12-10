@@ -21,7 +21,7 @@ for country in asia:
     country_dict[country] = 'asia'
 
 europe = ['Albania', 'Andorra', 'Austria', 'Belarus', 'Belgium', 'Bosnia and Herzegovina', 'Bulgaria', 'Croatia',
-          'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'England','France', 'Germany', 'Greece', 'Hungary', 'Iceland',
+          'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland',
           'Italy', 'Latvia', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Macedonia', 'Malta', 'Moldova', 'Monaco',
           'Montenegro', 'Netherlands', 'Norway', 'Poland', 'Portugal', 'Republic of Ireland', 'Romania', 'Russia',
           'San Marino', 'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Ukraine', 'United Kingdom',
