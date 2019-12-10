@@ -2,7 +2,7 @@
 """
 This model takes the winemag data & filters on the north_america and europe continents.
 After cleaning and prepping the data, 
-we run a bayesian linear models on the data using variational inference & pymc3
+we run a bayesian linear models on the data using variational inference & pymc3 
 """
 
 import pandas as pd
