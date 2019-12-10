@@ -1,6 +1,6 @@
 # Wine Enthusiast dataset - 
-## Classification models using LDA, Naive Bayes, & text mining 
-## Bayesian Linear Regression models to predict points assigned by wine reviewer
+#### Classification models using LDA, Naive Bayes, & text mining 
+#### Bayesian Linear Regression models to predict points assigned by wine reviewer
 
 FE.py is based on the following git page: https://github.com/gorokhovnik/wine_analysis/
 
