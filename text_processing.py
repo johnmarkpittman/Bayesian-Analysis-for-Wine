@@ -108,6 +108,6 @@ def avg_word_len(sentence):
         words = sentence.split()
         return round((sum(len(word) for word in words)/len(words)), 2)
     except ZeroDivisionError:
-        return 0
+        return 0 
     
 
