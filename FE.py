@@ -66,7 +66,7 @@ def FE(wine, country_cutoff=1000):
     wine.set_index('id', inplace=True)
 
     # creating 'year' feature
-    wine['year'] = wine['title'].str.extract(r'([1-9][0-9][0-9][0-9])')
+    wine['year'] = wine['title'].str.extract(r'([1-9][0-9][0-9][0-9])') 
 
     # creating 'continent' feature
     wine['continent'] = wine['country'].map(country_dict)
